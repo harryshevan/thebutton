@@ -12,29 +12,27 @@ export default function Home() {
     e.preventDefault();
     setError('');
     
+    if (!input.trim()) {
+      setError('Please enter a value');
+      return;
+    }
+    
     try {
-      const response = await fetch(`/api/check?text=${encodeURIComponent(input)}`);
-      const data = await response.json();
-      console.log('API Response:', data);
+      const response = await fetch('/api/secret', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: input }),
+        cache: 'no-store'
+      });
       
-      if (data.success) {
-        // Pass the entered value to /api/secret
-        const secretResponse = await fetch('/api/secret', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ text: input })
-        });
-        
-        if (secretResponse.ok) {
-          router.push('/complete');
-        } else {
-          setError('Failed to verify secret. Please try again.');
-        }
+      const data = await response.json();
+      
+      if (response.ok) {
+        router.push('/complete');
       } else {
-        setError(data.message || 'Incorrect secret. Please try again.');
-        console.log(data);
+        setError(data.error || 'Incorrect secret. Please try again.');
       }
     } catch (error) {
       setError('An error occurred. Please try again.');
@@ -44,11 +42,13 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-white">
-      <button
-        className="w-32 h-32 rounded-full bg-red-500 hover:bg-red-600 transition-colors mb-8"
-        onClick={() => {}}
-      />
       <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4">
+        <button
+          type="submit"
+          className="w-32 h-32 rounded-full bg-red-500 hover:bg-red-600 transition-colors mb-8 flex items-center justify-center text-white text-xl font-bold"
+        >
+          GET
+        </button>
         <input
           type="text"
           value={input}
@@ -56,12 +56,6 @@ export default function Home() {
           className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
           placeholder="Enter your guess..."
         />
-        <button
-          type="submit"
-          className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-        >
-          Submit
-        </button>
         {error && (
           <p className="text-sm text-gray-600 mt-2 max-w-md text-center break-all">
             {error}

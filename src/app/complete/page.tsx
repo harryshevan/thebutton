@@ -12,21 +12,42 @@ export default function Complete() {
     // Fetch the secret from the API
     const fetchSecret = async () => {
       try {
+        // First get the JWT token
         const response = await fetch('/api/secret', {
-          method: 'GET'
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ text: 'verify' }), // Special value to verify access
+          cache: 'no-store'
         });
         
-        if (!response.ok) {
-          throw new Error('Failed to fetch secret');
-        }
-
         const data = await response.json();
-        if (data.secret) {
-          setSecret(data.secret);
-          setShowContent(true);
+        
+        if (response.ok && data.secret) {
+          // Now verify the token and get the actual secret
+          const verifyResponse = await fetch('/api/verify', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token: data.secret }),
+            cache: 'no-store'
+          });
+
+          const verifyData = await verifyResponse.json();
+          
+          if (verifyResponse.ok && verifyData.secret) {
+            setSecret(verifyData.secret);
+            setShowContent(true);
+          } else {
+            throw new Error(verifyData.error || 'Failed to verify token');
+          }
+        } else {
+          throw new Error(data.error || 'Failed to fetch secret');
         }
       } catch (error) {
-        console.error('Error fetching secret:', error);
+        console.error('Error:', error);
         router.push('/');
       }
     };
