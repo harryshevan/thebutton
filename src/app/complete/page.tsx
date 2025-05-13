@@ -24,7 +24,7 @@ export default function Complete() {
           Congratulations!
         </h1>
         <p className="text-2xl text-white/90 mb-8">
-          You've completed the quest!
+          You&apos;ve completed the quest!
         </p>
         <button
           onClick={() => router.push('/')}
