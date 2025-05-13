@@ -15,10 +15,25 @@ export default function Home() {
     try {
       const response = await fetch(`/api/check?text=${encodeURIComponent(input)}`);
       const data = await response.json();
+      console.log('API Response:', data);
       
       if (data.success) {
-        router.push('/complete');
+        // Pass the entered value to /api/secret
+        const secretResponse = await fetch('/api/secret', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ text: input })
+        });
+        
+        if (secretResponse.ok) {
+          router.push('/complete');
+        } else {
+          setError('Failed to verify secret. Please try again.');
+        }
       } else {
+        setError(data.message || 'Incorrect secret. Please try again.');
         console.log(data);
       }
     } catch (error) {

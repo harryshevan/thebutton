@@ -5,12 +5,38 @@ import { useRouter } from 'next/navigation';
 
 export default function Complete() {
   const [showContent, setShowContent] = useState(false);
+  const [secret, setSecret] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    // Trigger animation after component mount
-    setShowContent(true);
-  }, []);
+    // Fetch the secret from the API
+    const fetchSecret = async () => {
+      try {
+        const response = await fetch('/api/secret', {
+          method: 'GET'
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch secret');
+        }
+
+        const data = await response.json();
+        if (data.secret) {
+          setSecret(data.secret);
+          setShowContent(true);
+        }
+      } catch (error) {
+        console.error('Error fetching secret:', error);
+        router.push('/');
+      }
+    };
+
+    fetchSecret();
+  }, [router]);
+
+  if (!secret) {
+    return null; // Don't show anything until we have the secret
+  }
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-400 to-yellow-600">
@@ -24,10 +50,12 @@ export default function Complete() {
           Congratulations!
         </h1>
         <p className="text-2xl text-white/90 mb-8">
-          You&apos;ve completed the quest!
+          You&apos;ve completed the quest! The secret word is: &quot;{secret}&quot;
         </p>
         <button
-          onClick={() => router.push('/')}
+          onClick={() => {
+            router.push('/');
+          }}
           className="px-8 py-3 bg-white text-yellow-600 rounded-full font-semibold 
                    hover:bg-yellow-100 transition-colors duration-300 
                    transform hover:scale-105 active:scale-95"

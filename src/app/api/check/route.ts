@@ -5,7 +5,7 @@ const secret = new TextEncoder().encode(
   process.env.JWT_SECRET || 'your-secret-key'
 );
 
-const CORRECT_ANSWER = process.env.CORRECT_ANSWER || 'the-secret-answer';
+const CORRECT_ANSWER = process.env.JWT_SECRET || 'your-secret-key';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -30,6 +30,6 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     success: isCorrect,
-    token,
+    jwt_token: token,
   });
 } 
