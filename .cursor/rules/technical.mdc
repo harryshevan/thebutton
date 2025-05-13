@@ -1,0 +1,22 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+
+"Thebutton" is an interactive quest to test basic software developers skills debugging web app.
+
+
+Core idea: the main app is web site. The UI presents single round button in the middle of the screen.
+The button is clickable. There is a form under the button. The button sends GET http request with text that is entered into form.
+The user should guess what to enter in that form. How he should guess? The incorrect requests should return the answer in response as JWT.
+The JWT public part should contain the codeword.
+
+
+Stack: next.js + SSR
+
+App pages:
+1) main page with red button, white background and form
+2) quest complete page with yellow background and fancy emoji fullscreen
+
